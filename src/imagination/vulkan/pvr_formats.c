@@ -809,7 +809,8 @@ VkResult pvr_GetPhysicalDeviceImageFormatProperties2(
 
    /* Extract input structs */
    vk_foreach_struct_const (ext, pImageFormatInfo->pNext) {
-      switch (ext->sType) {
+      /* Casting to accept Mesa-private types w/o compiler warning */
+      switch ((unsigned)ext->sType) {
       case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_IMAGE_FORMAT_INFO:
          external_info = (const void *)ext;
          break;
@@ -820,6 +821,9 @@ VkResult pvr_GetPhysicalDeviceImageFormatProperties2(
          /* Nothing to do here, it's handled in
           * pvr_get_image_format_properties)
           */
+         break;
+      case VK_STRUCTURE_TYPE_WSI_IMAGE_CREATE_INFO_MESA:
+         /* Ignore but don't warn */
          break;
       default:
          vk_debug_ignored_stype(ext->sType);
