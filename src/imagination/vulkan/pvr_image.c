@@ -265,6 +265,7 @@ VkResult pvr_CreateImage(VkDevice _device,
 {
    VK_FROM_HANDLE(pvr_device, device, _device);
    struct pvr_image *image;
+   VkResult res;
 
    if (wsi_common_is_swapchain_image(pCreateInfo)) {
       return wsi_common_create_swapchain_image(&device->pdevice->wsi_device,
@@ -277,7 +278,11 @@ VkResult pvr_CreateImage(VkDevice _device,
    if (!image)
       return vk_error(device, VK_ERROR_OUT_OF_HOST_MEMORY);
 
-   pvr_image_init(device, pCreateInfo, image);
+   res = pvr_image_init(device, pCreateInfo, image);
+   if (res != VK_SUCCESS) {
+      vk_image_destroy(&device->vk, pAllocator, &image->vk);
+      return res;
+   }
 
    *pImage = pvr_image_to_handle(image);
 
@@ -298,9 +303,9 @@ void pvr_DestroyImage(VkDevice _device,
    vk_image_destroy(&device->vk, pAllocator, &image->vk);
 }
 
-void pvr_image_init(struct pvr_device *device,
-                    const VkImageCreateInfo *pCreateInfo,
-                    struct pvr_image *image)
+VkResult pvr_image_init(struct pvr_device *device,
+                        const VkImageCreateInfo *pCreateInfo,
+                        struct pvr_image *image)
 {
    unsigned pbe_stride_align = get_pbe_stride_align(&device->pdevice->dev_info);
 
@@ -312,7 +317,7 @@ void pvr_image_init(struct pvr_device *device,
                                        pbe_stride_align,
                                        &image->vk.drm_format_mod);
       if (res != VK_SUCCESS)
-         assert(res == VK_SUCCESS);
+         return res;
 
       assert(image->vk.drm_format_mod == DRM_FORMAT_MOD_LINEAR);
    }
@@ -320,6 +325,8 @@ void pvr_image_init(struct pvr_device *device,
    pvr_image_init_memlayout(image);
    pvr_image_init_physical_extent(image, pCreateInfo, pbe_stride_align);
    pvr_image_setup_mip_levels(image);
+
+   return VK_SUCCESS;
 }
 
 void pvr_image_fini(struct pvr_device *device, struct pvr_image *image)

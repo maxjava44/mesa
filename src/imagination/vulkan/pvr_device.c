@@ -1032,9 +1032,14 @@ void pvr_GetDeviceImageMemoryRequirements(
 {
    VK_FROM_HANDLE(pvr_device, device, _device);
    struct pvr_image image = { 0 };
+   ASSERTED VkResult res;
 
    vk_image_init(&device->vk, &image.vk, pInfo->pCreateInfo);
-   pvr_image_init(device, pInfo->pCreateInfo, &image);
+   res = pvr_image_init(device, pInfo->pCreateInfo, &image);
+   /* pvr_image_init() will fail for importing external buffers, which
+    * is prohibited for vkGetDeviceImageMemoryRequirements()
+    */
+   assert(res == VK_SUCCESS);
 
    VkImageMemoryRequirementsInfo2 image_info = {
       .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_REQUIREMENTS_INFO_2,
