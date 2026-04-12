@@ -766,14 +766,12 @@ static VkResult pvr_process_cmd_buffer(struct pvr_device *device,
                break;
          }
 
-         if (*suspended_rts) {
+         if (sub_cmd->is_resume) {
             sub_cmd->gfx.job.view_state.rt_datasets = *suspended_rts;
-
-            if (sub_cmd->gfx.job.geometry_terminate)
-               *suspended_rts = NULL;
-
-         } else if (!sub_cmd->gfx.job.geometry_terminate) {
+         } else if (sub_cmd->is_suspend) {
             *suspended_rts = sub_cmd->gfx.job.view_state.rt_datasets;
+         } else {
+            *suspended_rts = NULL;
          }
 
          assert(sub_cmd->gfx.job.view_state.rt_datasets);
@@ -1022,8 +1020,6 @@ static VkResult pvr_driver_queue_submit(struct vk_queue *queue,
       if (result != VK_SUCCESS)
          return result;
    }
-
-   assert(suspended_rts == NULL && "suspended graphics job never resumed");
 
    result = pvr_process_queue_signals(driver_queue,
                                       submit->signals,
