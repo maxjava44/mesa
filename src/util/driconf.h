@@ -633,6 +633,14 @@
                   "Enable fragmentStoresAndAtomics and vertexPipelineStoresAndAtomics on any architecture. (This may not work reliably and is for debug purposes only!)")
 
 /**
+ * \brief powervr specific configuration options
+ */
+
+#define DRI_CONF_PVR_ENABLE_LINEAR_IMAGE_LINEAR_FILTER(def) \
+   DRI_CONF_OPT_B(pvr_enable_linear_image_linear_filter, def, \
+                  "Enable advertisement of linear filtering on linear images (which works for 2D images but not 3D ones)")
+
+/**
  * \brief Turnip specific configuration options
  */
 

@@ -31,6 +31,7 @@ struct pvr_instance {
 
    uint8_t driver_build_sha[BLAKE3_KEY_LEN];
    uint32_t force_vk_vendor;
+   bool enable_linear_image_linear_filter;
 };
 
 VK_DEFINE_HANDLE_CASTS(pvr_instance,

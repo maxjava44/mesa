@@ -338,6 +338,10 @@ static const driOptionDescription pvr_dri_options[] = {
       DRI_CONF_VK_WSI_FORCE_SWAPCHAIN_TO_CURRENT_EXTENT(false)
       DRI_CONF_VK_X11_IGNORE_SUBOPTIMAL(false)
    DRI_CONF_SECTION_END
+
+   DRI_CONF_SECTION_MISCELLANEOUS
+      DRI_CONF_PVR_ENABLE_LINEAR_IMAGE_LINEAR_FILTER(false)
+   DRI_CONF_SECTION_END
 };
 /* clang-format on */
 
@@ -359,6 +363,9 @@ static void pvr_init_dri_options(struct pvr_instance *instance)
 
    instance->force_vk_vendor =
       driQueryOptioni(&instance->dri_options, "force_vk_vendor");
+   instance->enable_linear_image_linear_filter =
+      driQueryOptionb(&instance->dri_options,
+                      "pvr_enable_linear_image_linear_filter");
 }
 
 VkResult pvr_CreateInstance(const VkInstanceCreateInfo *pCreateInfo,

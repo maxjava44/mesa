@@ -34,6 +34,7 @@
 #include "pvr_csb.h"
 #include "pvr_device.h"
 #include "pvr_entrypoints.h"
+#include "pvr_instance.h"
 #include "pvr_limits.h"
 #include "pvr_formats.h"
 #include "pvr_macros.h"
@@ -262,12 +263,11 @@ pvr_get_image_format_features2(struct pvr_physical_device *pdevice,
       vk_format_get_ycbcr_info(vk_format);
 
    if (pvr_format->bind & PVR_BIND_SAMPLER_VIEW) {
+      const uint32_t first_component_size =
+         vk_format_get_component_bits(vk_format,
+                                      UTIL_FORMAT_COLORSPACE_RGB,
+                                      0);
       if (vk_tiling == VK_IMAGE_TILING_OPTIMAL) {
-         const uint32_t first_component_size =
-            vk_format_get_component_bits(vk_format,
-                                         UTIL_FORMAT_COLORSPACE_RGB,
-                                         0);
-
          flags |= VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT |
                   VK_FORMAT_FEATURE_2_TRANSFER_SRC_BIT |
                   VK_FORMAT_FEATURE_2_TRANSFER_DST_BIT;
@@ -288,6 +288,13 @@ pvr_get_image_format_features2(struct pvr_physical_device *pdevice,
          flags |= VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT |
                   VK_FORMAT_FEATURE_2_TRANSFER_SRC_BIT |
                   VK_FORMAT_FEATURE_2_TRANSFER_DST_BIT;
+
+         if (pdevice->instance->enable_linear_image_linear_filter &&
+             !vk_format_is_int(vk_format) &&
+             !vk_format_is_depth_or_stencil(vk_format) &&
+             first_component_size < 32) {
+            flags |= VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
+	 }
 
          if (ycbcr_info) {
             flags |= VK_FORMAT_FEATURE_2_COSITED_CHROMA_SAMPLES_BIT;
