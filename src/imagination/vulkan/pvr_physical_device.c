@@ -975,7 +975,6 @@ pvr_physical_device_setup_uuids(struct pvr_physical_device *const pdevice)
 
 static bool pvr_device_is_conformant(const struct pvr_device_info *info)
 {
-   const uint64_t bvnc = (info);
    return true;
 }
 
@@ -1090,8 +1089,6 @@ VkResult pvr_physical_device_init(struct pvr_physical_device *pdevice,
                             pdevice->dev_info.ident.public_name);
          goto err_pvr_winsys_destroy;
       }
-
-      vk_warn_non_conformant_implementation("powervr");
    }
 
    /* Setup available memory heaps and types */
