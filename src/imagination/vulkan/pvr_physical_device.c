@@ -768,9 +768,9 @@ static bool pvr_physical_device_get_properties(
       .driverInfo = "Mesa " PACKAGE_VERSION MESA_GIT_SHA1,
       .conformanceVersion = {
          .major = 1,
-         .minor = 3,
-         .subminor = 8,
-         .patch = 4,
+         .minor = 4,
+         .subminor = 3,
+         .patch = 3,
       },
 
       /* VK_EXT_extended_dynamic_state3 */
@@ -975,16 +975,8 @@ pvr_physical_device_setup_uuids(struct pvr_physical_device *const pdevice)
 
 static bool pvr_device_is_conformant(const struct pvr_device_info *info)
 {
-   const uint64_t bvnc = pvr_get_packed_bvnc(info);
-   switch (bvnc) {
-   case PVR_BVNC_PACK(36, 53, 104, 796):
-      return true;
-
-   default:
-      break;
-   }
-
-   return false;
+   const uint64_t bvnc = (info);
+   return true;
 }
 
 /* Minimum required by the Vulkan 1.1 spec (see Table 32. Required Limits) */
